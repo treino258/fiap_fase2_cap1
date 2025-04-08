@@ -1,6 +1,6 @@
 import os
 
-from src.database.logger.loggers import log_info, log_warning, log_error, log_success
+from src.logger.loggers import log_info, log_warning, log_error, log_success
 from src.database.login.senha import salvar_senha_arquivo_base64, carregar_senha_arquivo_base64
 from src.database.tipos_base.database import Database
 from src.database.utils import input_str, input_bool
@@ -52,8 +52,7 @@ def iniciar_database():
 
         if salvar:
             salvar_senha_arquivo_base64(user, senha)
-
-    print('FIM')
+            log_success("--- Senha salva com sucesso! ---", write=False)
 
 
 

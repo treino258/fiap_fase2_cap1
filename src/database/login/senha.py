@@ -24,8 +24,11 @@ def salvar_senha_arquivo_base64(user:str, senha:str):
 
 def carregar_senha_arquivo_base64() -> tuple[str | None, str | None]:
 
-    with open('senha_muito_secreta.txt', 'r') as arquivo:
-        base64_string = arquivo.read()
+    try:
+        with open('senha_muito_secreta.txt', 'r') as arquivo:
+            base64_string = arquivo.read()
+    except FileNotFoundError:
+        return None, None
 
     base64_bytes = base64_string.encode('utf-8')
     json_bytes = base64.b64decode(base64_bytes)

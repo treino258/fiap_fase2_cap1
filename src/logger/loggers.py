@@ -1,7 +1,7 @@
 from enum import StrEnum
 from datetime import datetime
 
-from src.database.logger.color_text import makeRed, makeYellow, makeBlue, makeCyan, makeMagenta, makeGreen
+from src.logger.color_text import makeRed, makeYellow, makeBlue, makeCyan, makeMagenta, makeGreen
 
 
 class LEVEL(StrEnum):
