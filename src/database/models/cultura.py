@@ -1,6 +1,6 @@
-from enum import Enum, StrEnum
+from enum import StrEnum
 
-from src.database.model import Model
+from src.database.tipos_base.model import Model
 from dataclasses import dataclass, field
 
 

@@ -1,11 +1,20 @@
 from enum import Enum
 
 
-def input_bool(field_name:str, old_value:bool|None=None) -> bool:
+def input_bool(field_name:str, old_value:bool|None=None, *,
+               modo:str='V' # ou 'S'
+               ) -> bool:
     """
     Função auxiliar para obter um valor booleano do usuário.
     """
-    input_string = f"Digite o valor de {field_name} [V]erdadeiro/[F]also"
+
+    if modo == 'V':
+        input_string = f"Digite o valor de {field_name} [V]erdadeiro/[F]also"
+    elif modo == 'S':
+        input_string = "[S]im/[N]ão"
+    else:
+        raise ValueError(f"Modo inválido: {modo}. Esperado 'V' ou 'S'")
+
 
     if old_value is not None:
         input_string += f"\n(Pressione enter para manter o valor {old_value}): "
@@ -17,12 +26,15 @@ def input_bool(field_name:str, old_value:bool|None=None) -> bool:
     if value.strip() == '' and old_value is not None:
         return old_value
 
-    opcoes = ['v', 'verdadeiro', 'true', 'f', 'falso', 'false']
+    opcoes = ['v', 'verdadeiro', 'true', 's', 'sim', 'f', 'falso', 'false', 'n', 'não', 'nao', 'no']
 
     if value.lower().strip() in opcoes:
-        return  value.lower().strip() in ['v', 'verdadeiro', 'true']
+        return  value.lower().strip() in ['v', 'verdadeiro', 'true', 's', 'sim']
 
-    raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado [V]erdadeiro/[F]also")
+    if modo == 'V':
+        raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado [V]erdadeiro/[F]also")
+    else:
+        raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado [S]im/[N]ão")
 
 def input_int(field_name:str, old_value:int|None=None) -> int:
     """
@@ -66,7 +78,7 @@ def input_float(field_name:str, old_value:float|None=None) -> float:
     except ValueError:
         raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado um número com ou sem casas decimais")
 
-def input_str(field_name:str, old_value:str|None=None, *, max_length:int|None) -> str:
+def input_str(field_name:str, old_value:str|None=None, *, max_length:int|None=None, message_override:str=None) -> str:
     """
     Função auxiliar para obter um valor string do usuário.
     """
@@ -76,6 +88,8 @@ def input_str(field_name:str, old_value:str|None=None, *, max_length:int|None) -
         input_string += f"\n(Pressione enter para manter o valor {old_value}): "
     else:
         input_string += ": "
+
+    input_string = message_override or input_string
 
     value = input(input_string)
 

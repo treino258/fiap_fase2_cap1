@@ -1,16 +1,13 @@
 from dataclasses import dataclass, fields, field, asdict, InitVar
 from enum import Enum
-from time import sleep
 from typing import get_type_hints, Union, ClassVar
 import json
-import oracledb
-
+from src.database.tipos_base.query import Query
 from src.database.utils import input_bool, input_int, input_str, input_float, input_enum
-
 
 # coloco o frozen = True e eq=True para poder comparar as classe e coloca-las em dicionário/set
 @dataclass(frozen=True, eq=True)
-class Model:
+class Model(Query):
 
     id: int | None  = field(kw_only=True, default=None)
 
@@ -170,59 +167,11 @@ class Model:
 
     #------------- DATABASE ---------------------
 
-    conn:ClassVar[oracledb.Connection | None] = None
-    cursor:ClassVar[oracledb.Cursor | None] = None
-
-    @staticmethod
-    def init_oracledb(*, user, password, dsn='oracle.fiap.com.br:1521/ORCL') -> bool:
-        try:
-            conn = oracledb.connect(user=user, password=password, dsn=dsn)
-            # Cria as instruções para cada módulo
-
-            if not conn.is_healthy():
-                raise Exception("Conexão não está saudável")
-
-            Model.conn = conn
-            Model.cursor = conn.cursor()
-            return True
-        except Exception as e:
-            print('Falha ao conectar ao banco de dados')
-            print("Erro: ", e)
-            return  False
-
-    @staticmethod
-    def _execute_sql(sql:str, *, max_retries:int=3, commit:bool=True):
-        '''Executa um comando sql no banco de dados'''
-        if Model.conn is None:
-            raise ValueError("Banco de dados não inicializado")
-
-        if Model.cursor is None:
-            raise ValueError("Cursor não inicializado")
-
-        retries = 0
-
-        while retries < max_retries:
-            try:
-                retorno = Model.cursor.execute(sql)
-                print(retorno)
-                if commit:
-                    Model.conn.commit()
-                break
-            except Exception as e:
-                if retries >= max_retries:
-                    raise e
-                retries += 1
-
-                print("Erro ao executar o comando SQL")
-                print("Erro: ", e)
-                print(f"Tentando novamente {retries + 1} tentativas...")
-
-                sleep(retries)
 
     @classmethod
     def _create_table_sql(cls) -> str:
         '''Retorna o comando sql para criar a table referente a esta dataclass na oracladb'''
-        table_name = cls.__name__.lower()
+        table_name = cls.table_name()
         columns = []
 
         for field in fields(cls):
@@ -257,14 +206,14 @@ class Model:
         if not cls.check_if_table_exists():
             print(f"Tabela não existe, criando tabela {cls.__name__.lower()}")
             sql = cls._create_table_sql()
-            cls._execute_sql(sql)
+            cls.execute_sql(sql)
         else:
             print(f"Tabela já existe, não é necessário criar a tabela {cls.__name__.lower()}")
 
     @classmethod
     def check_if_table_exists(cls):
         '''Verifica se a tabela existe no banco de dados'''
-        table_name = cls.__name__.lower()
+        table_name = cls.table_name()
         sql = f"SELECT COUNT(*) FROM user_tables WHERE table_name = '{table_name}'"
         cursor = cls.cursor
         cursor.execute(sql)
@@ -273,7 +222,7 @@ class Model:
 
     def _create_save_sql(self):
         '''Retorna o comando sql para criar a table referente a esta dataclass na oracladb'''
-        table_name = self.__name__.lower()
+        table_name = self.table_name()
         columns = []
         values = []
         for field in fields(self):
@@ -290,7 +239,7 @@ class Model:
         if self.get_value('id') is None:
             raise ValueError("Não é possível atualizar um registro sem id")
 
-        table_name = self.__name__.lower()
+        table_name = self.table_name()
         columns = []
         for field in fields(self):
             if field.name == 'id':
@@ -309,7 +258,7 @@ class Model:
             sql = self._create_update_sql()
 
         try:
-            Model._execute_sql(sql)
+            Model.execute_sql(sql)
             return True
         except Exception as e:
             return  False
@@ -321,33 +270,11 @@ class Model:
         if self.get_value('id') is None:
             raise ValueError("Não é possível excluir um registro sem id")
 
-        table_name = self.__name__.lower()
+        table_name = self.table_name()
         return  f"DELETE FROM {table_name} WHERE id ={self.get_value('id')}"
 
     def delete(self) -> 'Model':
 
         sql = self._create_delete_sql()
-        Model._execute_sql(sql)
+        Model.execute_sql(sql)
         return self
-
-
-    #------------- Fetch From DB ---------------------
-
-    @classmethod
-    def fetch_all(cls) -> list['Model']:
-        '''Retorna todos os registros da tabela referente a esta dataclass na oracladb'''
-        table_name = cls.__name__.lower()
-        sql = f"SELECT * FROM {table_name}"
-        cursor = cls.cursor
-        cursor.execute(sql)
-        result = cursor.fetchall()
-        return [cls.from_dict(dict(zip([col[0] for col in cursor.description], row))) for row in result]
-
-    @classmethod
-    def fetch_by_id(cls, id:int) -> 'Model':
-        table_name = cls.__name__.lower()
-        sql = f"SELECT * FROM {table_name} WHERE id = {id}"
-        cursor = cls.cursor
-        cursor.execute(sql)
-        result = cursor.fetchall()
-        return cls.from_dict(dict(zip([col[0] for col in cursor.description], result[0])))
