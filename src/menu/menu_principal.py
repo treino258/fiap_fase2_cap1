@@ -1,35 +1,35 @@
-from src.database.models.fazenda import Fazenda
-from src.database.utils import input_bool
-from src.logger.loggers import log_info
-from src.menu.alterar_fazenda import alterar_fazendas
-from src.menu.cadastrar_fazenda import cadastrar_fazenda
-from src.menu.excluir_fazenda import excluir_fazendas
-from src.menu.listar_fazendas import listar_fazendas
+from src.menu.fazenda.menu_fazenda import menu_fazenda
+from src.menu.insumos.menu_insumos import menu_insumos
 
 
 def menu_principal() -> None|bool:
 
     print('Bem-vindo ao sistema de gerenciamento de Fazendas!')
-
-    print('1) Cadastrar Fazenda')
-    print('2) Listar Fazendas')
-    print('3) Editar Fazenda')
-    print('4) Excluir Fazenda')
+    print()
+    print('1) Manutenção de fazendas')
+    print('2) Manutenção de insumos')
+    print('3) Manutenção de maquinários')
+    print('5) Relatórios')
+    print()
+    print('0) Sair')
 
     escolha = input("Escolha uma opção: ")
 
     match escolha:
+        case '0':
+            return True
+
         case '1':
-            cadastrar_fazenda()
+            menu_fazenda()
 
         case '2':
-            listar_fazendas()
+            menu_insumos()
 
         case '3':
-            alterar_fazendas()
+            print('Manutenção de maquinários')
 
         case '4':
-            excluir_fazendas()
+            print('Relatórios')
         case _:
             print('Opção inválida. Tente novamente.')
 

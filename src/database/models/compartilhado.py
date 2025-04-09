@@ -26,3 +26,19 @@ class FormatoArea(StrEnum):
             return "Triângulo"
 
         return super().name
+
+class UnidadesInsumo(StrEnum):
+    TONELADA = "t"
+    KILO = "kg"
+    LITRO = "l"
+    GRAMAS = "g"
+    ML = "ml"
+
+
+    @property
+    def name(self):
+
+        if self.value == "t":
+            return "Tonelada"
+
+        return super().name.upper()

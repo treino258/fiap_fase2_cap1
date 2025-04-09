@@ -1,8 +1,7 @@
-from src.database.models.compartilhado import TipoCultura, FormatoArea
+from src.database.login.iniciar_database import iniciar_database
+from src.database.models.compartilhado import TipoCultura, FormatoArea, UnidadesInsumo
 from src.database.tipos_base.model import Model
 from dataclasses import dataclass, field
-
-
 
 @dataclass(frozen=True, eq=True)
 class Insumo(Model):
@@ -15,12 +14,16 @@ class Insumo(Model):
         'label': 'Tipo de Cultura',
     })
 
+    unidade:UnidadesInsumo = field(metadata={
+        'label': 'Unidade de Medida',
+    })
+
     consumo: float = field(metadata={
-        'label': 'Consumo por hectare (kg)',
+        'label': 'Consumo por hectare',
     })
 
     custo: float = field(metadata={
-        'label': 'Custo por kg (R$)',
+        'label': 'Custo por unidade (R$)',
     })
 
     def custo_total(self, area: float) -> float:
@@ -33,3 +36,8 @@ class Insumo(Model):
         area_hectare = area / 10000  # Convertendo m² para hectares
 
         return self.consumo * area_hectare * self.custo
+
+if __name__ == "__main__":
+    # iniciar_database()
+    # Insumo.drop_table()
+    pass

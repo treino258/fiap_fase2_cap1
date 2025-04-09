@@ -14,6 +14,14 @@ class Model(Query):
 
     id: int | None  = field(kw_only=True, default=None)
 
+    @classmethod
+    def display_name(cls):
+        return cls.__name__.capitalize()
+
+    @classmethod
+    def display_name_plural(cls):
+        return cls.__name__.capitalize() + 's'
+
     #------------- CONSTRUCTOR ---------------------
 
     @classmethod
@@ -225,7 +233,8 @@ class Model(Query):
         return pd.DataFrame.from_records(
             data=data,
             columns=data[0].keys(),
-            index='id'
+            index='id',
+
         )
 
 
@@ -292,6 +301,39 @@ class Model(Query):
         fetch = cursor.fetchone()
         result = fetch[0]
         return result > 0
+
+    @classmethod
+    def _create_drop_table_sql(cls) -> str:
+        '''Retorna o comando sql para criar a table referente a esta dataclass na oracladb'''
+        table_name = cls.table_name()
+        return f"DROP TABLE {table_name}"
+
+    @classmethod
+    def drop_table(cls):
+        log_info(f"Iniciando exclusão da tabela {cls.table_name()}")
+
+        print(f"A tabela {cls.table_name()} será excluída, deseja continuar?")
+
+        continuar = input_bool("Continuar Exclusão", modo='S')
+
+        if not continuar:
+            log_success(f"Exclusão da tabela {cls.table_name()} cancelada com sucesso!")
+            return
+
+
+        if not cls.check_if_table_exists():
+            log_warning(f"A tabela {cls.table_name()} não existe na database, não é possível excluir a tabela")
+            return
+
+        sql = cls._create_drop_table_sql()
+
+        try:
+            cls.execute_sql(sql)
+            log_success(f"Tabela {cls.table_name()} excluída com sucesso")
+        except Exception as e:
+            log_error(f"Erro ao excluir tabela: {e}")
+            raise e
+
 
     def _create_save_sql(self):
         '''Retorna o comando sql para criar a table referente a esta dataclass na oracladb'''
