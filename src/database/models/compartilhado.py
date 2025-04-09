@@ -30,8 +30,8 @@ class FormatoArea(StrEnum):
 class UnidadesInsumo(StrEnum):
     TONELADA = "t"
     KILO = "kg"
-    LITRO = "l"
     GRAMAS = "g"
+    LITRO = "l"
     ML = "ml"
 
 
