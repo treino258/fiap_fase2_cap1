@@ -15,7 +15,7 @@ class Insumo(Model):
     })
 
     unidade:UnidadesInsumo = field(metadata={
-        'label': 'Unidade de Medida',
+        'label': 'Un. de Medida',
     })
 
     consumo: float = field(metadata={
@@ -23,14 +23,14 @@ class Insumo(Model):
     })
 
     custo: float = field(metadata={
-        'label': 'Custo por unidade (R$)',
+        'label': 'Custo por un. de medida',
     })
 
     def custo_total(self, area: float) -> float:
         """
         Calcula o custo total do insumo com base na área e no consumo.
         :param area: Área em m2.
-        :return: Custo total em R$.
+        :return: Custo total.
         """
 
         area_hectare = area / 10000  # Convertendo m² para hectares

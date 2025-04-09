@@ -23,7 +23,7 @@ class FormatoArea(StrEnum):
             return "Retângulo"
 
         if self.value == "triangulo":
-            return "Triângulo"
+            return "Triângulo Retângulo"
 
         return super().name
 

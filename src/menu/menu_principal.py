@@ -1,15 +1,16 @@
 from src.menu.fazenda.menu_fazenda import menu_fazenda
 from src.menu.insumos.menu_insumos import menu_insumos
+from src.menu.maquinario.menu_maquinario import menu_maquinario
 
 
 def menu_principal() -> None|bool:
 
     print('Bem-vindo ao sistema de gerenciamento de Fazendas!')
     print()
-    print('1) Manutenção de fazendas')
-    print('2) Manutenção de insumos')
-    print('3) Manutenção de maquinários')
-    print('5) Relatórios')
+    print('1) Manutenção de Fazendas')
+    print('2) Manutenção de Insumos')
+    print('3) Manutenção de Maquinários')
+    print('4) Relatórios')
     print()
     print('0) Sair')
 
@@ -26,7 +27,7 @@ def menu_principal() -> None|bool:
             menu_insumos()
 
         case '3':
-            print('Manutenção de maquinários')
+            menu_maquinario()
 
         case '4':
             print('Relatórios')

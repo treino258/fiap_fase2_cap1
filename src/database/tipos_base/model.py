@@ -20,7 +20,7 @@ class Model(Query):
 
     @classmethod
     def display_name_plural(cls):
-        return cls.__name__.capitalize() + 's'
+        return cls. display_name().capitalize() + 's'
 
     #------------- CONSTRUCTOR ---------------------
 
