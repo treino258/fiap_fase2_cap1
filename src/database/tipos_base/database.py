@@ -25,7 +25,7 @@ class Database(ABC):
             return False
 
     @staticmethod
-    def execute_sql(sql: str, *, max_retries: int = 3, commit: bool = True):
+    def execute_sql(sql: str, *, max_retries: int = 3, commit: bool = True, **kwargs):
         '''Executa um comando sql no banco de dados'''
         if Database.conn is None:
             raise ValueError("Banco de dados não inicializado")
@@ -37,15 +37,14 @@ class Database(ABC):
 
         while retries < max_retries:
             try:
-                retorno = Database.cursor.execute(sql)
-                print(retorno)
+                Database.cursor.execute(sql, **kwargs)
                 if commit:
                     Database.conn.commit()
                 break
             except Exception as e:
+                retries += 1
                 if retries >= max_retries:
                     raise e
-                retries += 1
 
                 print("Erro ao executar o comando SQL")
                 print("Erro: ", e)
@@ -56,4 +55,4 @@ class Database(ABC):
     @classmethod
     def table_name(cls) -> str:
         '''Retorna o nome da tabela referente a esta dataclass na oracladb'''
-        return cls.__name__.lower()
+        return cls.__name__.upper()

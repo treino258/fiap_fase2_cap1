@@ -4,6 +4,9 @@ from typing import get_type_hints, Union, ClassVar
 import json
 from src.database.tipos_base.query import Query
 from src.database.utils import input_bool, input_int, input_str, input_float, input_enum
+from src.logger.loggers import log_info, log_success, log_error, log_warning
+import pandas as pd
+
 
 # coloco o frozen = True e eq=True para poder comparar as classe e coloca-las em dicionário/set
 @dataclass(frozen=True, eq=True)
@@ -57,7 +60,7 @@ class Model(Query):
                                            )
                         new_values[field.name] = valor
                     except ValueError as e:
-                        print(e)
+                        log_error(str(e))
                         valor = None
 
             elif field.type is bool or issubclass(field.type, bool):
@@ -70,7 +73,7 @@ class Model(Query):
                         valor = input_bool(field_name=field.metadata.get('label', field.name.capitalize()), old_value=_old_data.get(field.name))
                         new_values[field.name] = valor
                     except ValueError as e:
-                        print(e)
+                        log_error(str(e))
                         valor = None
 
             elif field.type is int or issubclass(field.type, int):
@@ -83,7 +86,7 @@ class Model(Query):
                         valor = input_int(field_name=field.metadata.get('label', field.name.capitalize()), old_value=_old_data.get(field.name))
                         new_values[field.name] = valor
                     except ValueError as e:
-                        print(e)
+                        log_error(str(e))
                         valor = None
 
             elif field.type is float or issubclass(field.type, float):
@@ -96,7 +99,7 @@ class Model(Query):
                         valor = input_float(field_name=field.metadata.get('label', field.name.capitalize()), old_value=_old_data.get(field.name))
                         new_values[field.name] = valor
                     except ValueError as e:
-                        print(e)
+                        log_error(str(e))
                         valor = None
 
             elif field.type is str or issubclass(field.type, str):
@@ -109,7 +112,7 @@ class Model(Query):
                         valor = input_str(field_name=field.metadata.get('label', field.name.capitalize()), old_value=_old_data.get(field.name), max_length=field.metadata.get('max_length'))
                         new_values[field.name] = valor
                     except ValueError as e:
-                        print(e)
+                        log_error(str(e))
                         valor = None
 
             else:
@@ -157,16 +160,54 @@ class Model(Query):
 
         valor = getattr(self, field_name)
 
-        if valor is None:
-            return 'null'
-
-        elif isinstance(valor, Enum):
+        if isinstance(valor, Enum):
             return valor.value
 
         return valor
 
-    #------------- DATABASE ---------------------
+    def as_display(self) -> dict:
 
+        fields = self.fields()
+
+        retorno = {}
+
+        for f in fields:
+
+            if f.name == 'id':
+                if self.id is None:
+                    retorno['id'] = 'Novo'
+                else:
+                    retorno['id'] = self.id
+                continue
+
+
+            label = f.metadata.get('label', f.name.capitalize())
+            value = getattr(self, f.name)
+
+            if isinstance(value, Enum):
+                retorno[label] = value.name
+            else:
+                retorno[label] = value
+
+        return retorno
+
+
+    def get_dataframe(self):
+
+        data = self.as_display()
+
+        return pd.DataFrame.from_records(
+            data=[data],
+            columns=data.keys(),
+            index='id'
+        )
+        #          .style.set_properties(**{
+        #     'text-align': 'left',
+        #     'font-size': '12px'
+        # })
+
+
+    #------------- DATABASE ---------------------
 
     @classmethod
     def _create_table_sql(cls) -> str:
@@ -200,15 +241,16 @@ class Model(Query):
         return  f"CREATE TABLE {table_name} ({', '.join(columns)})"
 
     @classmethod
-    def create_table(cls):
+    def check_or_create_table(cls):
         '''Cria a tabela referente a esta dataclass na oracladb'''
 
         if not cls.check_if_table_exists():
-            print(f"Tabela não existe, criando tabela {cls.__name__.lower()}")
+            log_info(f"Tabela não existe, criando tabela {cls.table_name()}")
             sql = cls._create_table_sql()
             cls.execute_sql(sql)
+            log_success(f"Tabela criada com sucesso {cls.table_name()}")
         else:
-            print(f"Tabela já existe, não é necessário criar a tabela {cls.__name__.lower()}")
+            log_info(f"Tabela já existe, não é necessário criar a tabela {cls.table_name()}")
 
     @classmethod
     def check_if_table_exists(cls):
@@ -217,7 +259,8 @@ class Model(Query):
         sql = f"SELECT COUNT(*) FROM user_tables WHERE table_name = '{table_name}'"
         cursor = cls.cursor
         cursor.execute(sql)
-        result = cursor.fetchone()[0]
+        fetch = cursor.fetchone()
+        result = fetch[0]
         return result > 0
 
     def _create_save_sql(self):
@@ -228,10 +271,9 @@ class Model(Query):
         for field in fields(self):
             if field.name == 'id':
                 continue
-            columns.append(field.name)
-            values.append(f":{getattr(self, field.name)}")
-
-        return  f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(values)})"
+            columns.append(field.name.upper())
+            values.append(f"'{self.get_value(field.name)}'")
+        return  f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(values)}) RETURNING id INTO :id"
 
     def _create_update_sql(self):
         '''Retorna o comando sql para criar a table referente a esta dataclass na oracladb'''
@@ -248,20 +290,24 @@ class Model(Query):
 
         return  f"UPDATE {table_name} SET {', '.join(columns)} WHERE id ={self.get_value('id')}"
 
-    def save(self):
+    def save(self) -> 'Model':
 
         if self.id is None:
-            print("Salvando novo registro")
+            log_info("Salvando novo registro")
             sql = self._create_save_sql()
         else:
-            print("Atualizando registro")
+            log_info("Atualizando registro")
             sql = self._create_update_sql()
-
+        id_var = Model.cursor.var(int)
         try:
-            Model.execute_sql(sql)
-            return True
+            Model.execute_sql(sql, id=id_var)
+            log_success(f"Registro salvo com sucesso")
+            novo_id = id_var.getvalue()[0]
+            return self.copy_with({'id': novo_id})
+
         except Exception as e:
-            return  False
+            log_error(f"Erro ao salvar registro: {e}")
+            raise e
 
     def _create_delete_sql(self):
         '''Retorna o comando sql para criar a table referente a esta dataclass na oracladb'''
@@ -274,7 +320,8 @@ class Model(Query):
         return  f"DELETE FROM {table_name} WHERE id ={self.get_value('id')}"
 
     def delete(self) -> 'Model':
-
+        log_warning("Excluindo registro")
         sql = self._create_delete_sql()
         Model.execute_sql(sql)
+        log_success(f"Registro excluído com sucesso")
         return self
