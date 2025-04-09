@@ -3,6 +3,9 @@ from typing import ClassVar
 import oracledb
 from abc import ABC
 
+from src.logger.loggers import log_debug
+
+
 class Database(ABC):
     conn: ClassVar[oracledb.Connection | None] = None
     cursor: ClassVar[oracledb.Cursor | None] = None
@@ -42,6 +45,9 @@ class Database(ABC):
                     Database.conn.commit()
                 break
             except Exception as e:
+
+                log_debug(f'Erro ao executar o comando SQL\n {e}\n {type(e)}')
+
                 retries += 1
                 if retries >= max_retries:
                     raise e

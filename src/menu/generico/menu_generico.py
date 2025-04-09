@@ -3,6 +3,7 @@ from src.database.tipos_base.model import Model
 from src.menu.generico.alterar_generico import alterar_generico
 from src.menu.generico.cadastrar_generico import cadastrar_generico
 from src.menu.generico.excluir_generico import excluir_generico
+from src.menu.generico.exportar_generico import exportar_generico
 from src.menu.generico.listar_generico import listar_generico
 
 
@@ -15,6 +16,7 @@ def menu_generico(model:type[Model]):
         print(f'2) Listar {model.display_name_plural()}')
         print(f'3) Editar {model.display_name()}')
         print(f'4) Excluir {model.display_name()}')
+        print(f"5) Exportar {model.display_name_plural()} para JSON")
         print()
         print('0) Voltar para o menu principal')
 
@@ -35,5 +37,9 @@ def menu_generico(model:type[Model]):
 
             case '4':
                 excluir_generico(model)
+
+            case '5':
+                exportar_generico(model)
+
             case _:
                 print('Opção inválida. Tente novamente.')
