@@ -36,7 +36,7 @@ def input_bool(field_name:str, old_value:bool|None=None, *,
     else:
         raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado [S]im/[N]ão")
 
-def input_int(field_name:str, old_value:int|None=None) -> int:
+def input_int(field_name:str, old_value:int|None=None, message_override:str=None) -> int:
     """
     Função auxiliar para obter um valor inteiro do usuário.
     """
@@ -46,6 +46,8 @@ def input_int(field_name:str, old_value:int|None=None) -> int:
         input_string += f"\n(Pressione enter para manter o valor {old_value}): "
     else:
         input_string += ": "
+
+    input_string = message_override or input_string
 
     value = input(input_string)
 
@@ -101,7 +103,7 @@ def input_str(field_name:str, old_value:str|None=None, *, max_length:int|None=No
 
     return value.strip()
 
-def input_enum(field_name:str, enum_class: Enum, old_value: str|None=None) -> str:
+def input_enum(field_name:str, enum_class: type[Enum], old_value: str|None=None) -> str:
     """
     Função auxiliar para obter um valor de um Enum do usuário.
     """
@@ -113,7 +115,7 @@ def input_enum(field_name:str, enum_class: Enum, old_value: str|None=None) -> st
         input_string += f"\n{index+1}) {value.name}"
 
     if old_value is not None:
-        input_string += f"\n(Pressione enter para manter o valor {old_value}): "
+        input_string += f"\n(Pressione enter para manter o valor {enum_class(old_value).name}): "
     else:
         input_string += "\nEscolha uma opção: "
 

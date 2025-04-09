@@ -1,6 +1,10 @@
-from src.database.models.cultura import Cultura
+from src.database.models.fazenda import Fazenda
 from src.database.utils import input_bool
 from src.logger.loggers import log_info
+from src.menu.alterar_fazenda import alterar_fazendas
+from src.menu.cadastrar_fazenda import cadastrar_fazenda
+from src.menu.excluir_fazenda import excluir_fazendas
+from src.menu.listar_fazendas import listar_fazendas
 
 
 def menu_principal() -> None|bool:
@@ -16,28 +20,16 @@ def menu_principal() -> None|bool:
 
     match escolha:
         case '1':
-            nova_cultura = Cultura.from_terminal_input()
-            print()
-            print('Foram digitas as seguintes informações:')
-            print(nova_cultura.get_dataframe())
-            print()
-            print('Você gostaria de salvar as informações?')
-            salvar = input_bool('Salvar', modo='S')
+            cadastrar_fazenda()
 
-            if salvar:
-                nova_cultura.save()
-                input("Pressione enter para continuar...")
-
-            # Chamar função para cadastrar fazenda
         case '2':
-            print('Listar Fazendas')
-            # Chamar função para listar fazendas
+            listar_fazendas()
+
         case '3':
-            print('Editar Fazenda')
-            # Chamar função para editar fazenda
+            alterar_fazendas()
+
         case '4':
-            print('Excluir Fazenda')
-            # Chamar função para excluir fazenda
+            excluir_fazendas()
         case _:
             print('Opção inválida. Tente novamente.')
 

@@ -43,6 +43,9 @@ class Model(Query):
 
         new_values = {}
 
+        if old_data is not None and old_data.get('id') is not None:
+            new_values['id'] = old_data.get('id')
+
         for field in fields(cls):
             if field.name == 'id':
                 continue
@@ -141,7 +144,7 @@ class Model(Query):
         else:
             raise TypeError(f"Tipo {type(other)} não suportado")
         # Retorna uma nova instância da dataclass com os valores atualizados
-        return self.from_dict(**self_dict)
+        return self.from_dict(self_dict)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -149,11 +152,13 @@ class Model(Query):
     def to_json(self):
         return  json.dumps(self.to_dict())
 
-    def fields(self):
-        return fields(self)
+    @classmethod
+    def fields(cls):
+        return fields(cls)
 
-    def field_names(self):
-        return [f.name for f in self.fields()]
+    @classmethod
+    def field_names(cls):
+        return [f.name for f in cls.fields()]
 
     def get_value(self, field_name):
         '''Retorna o valor do campo field_name da dataclass'''
@@ -206,8 +211,33 @@ class Model(Query):
         #     'font-size': '12px'
         # })
 
+    @classmethod
+    def get_dataframes(cls, instances:list['Model']) -> pd.DataFrame|None:
+
+        data = []
+
+        for i in instances:
+            data.append(i.as_display())
+
+        if len(data) == 0:
+            return None
+
+        return pd.DataFrame.from_records(
+            data=data,
+            columns=data[0].keys(),
+            index='id'
+        )
+
+
 
     #------------- DATABASE ---------------------
+    @classmethod
+    def field_from_db(cls, colum_name):
+        '''Retorna o nome do campo referente a coluna colum_name da dataclass'''
+        for field in cls.field_names():
+            if Model.colum_name(field) == colum_name:
+                return field
+        raise ValueError(f"Coluna {colum_name} não encontrada na dataclass {cls.__name__}")
 
     @classmethod
     def _create_table_sql(cls) -> str:
@@ -218,23 +248,23 @@ class Model(Query):
         for field in fields(cls):
 
             if field.name == 'id':
-                columns.append(f"{field.name} NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY")
+                columns.append(f"{Model.colum_name(field.name)} NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY")
 
             elif field.type is bool or issubclass(field.type, bool):
-                columns.append(f"{field.name} BOOLEAN")
+                columns.append(f"{Model.colum_name(field.name)} BOOLEAN")
 
             elif field.type is int or issubclass(field.type, int):
-                columns.append(f"{field.name} INT")
+                columns.append(f"{Model.colum_name(field.name)} INT")
 
             elif field.type is float or issubclass(field.type, float):
-                columns.append(f"{field.name} FLOAT")
+                columns.append(f"{Model.colum_name(field.name)} FLOAT")
 
             elif field.type is str or issubclass(field.type, str):
 
                 if field.metadata.get('max_length'):
-                    columns.append(f"{field.name} VARCHAR({field.metadata.get('max_length')})")
+                    columns.append(f"{Model.colum_name(field.name)} VARCHAR({field.metadata.get('max_length')})")
                 else:
-                    columns.append(f"{field.name} VARCHAR(255)")
+                    columns.append(f"{Model.colum_name(field.name)} VARCHAR(255)")
             else:
                 raise NotImplementedError(f"Tipo {field.type} não implementado")
 
@@ -271,7 +301,7 @@ class Model(Query):
         for field in fields(self):
             if field.name == 'id':
                 continue
-            columns.append(field.name.upper())
+            columns.append(Model.colum_name(field.name))
             values.append(f"'{self.get_value(field.name)}'")
         return  f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(values)}) RETURNING id INTO :id"
 
@@ -286,9 +316,9 @@ class Model(Query):
         for field in fields(self):
             if field.name == 'id':
                 continue
-            columns.append(f"{field.name} = '{self.get_value(field.name)}'")
+            columns.append(f"{Model.colum_name(field.name)} = '{self.get_value(field.name)}'")
 
-        return  f"UPDATE {table_name} SET {', '.join(columns)} WHERE id ={self.get_value('id')}"
+        return  f"UPDATE {table_name} SET {', '.join(columns)} WHERE id ={self.get_value('id')} RETURNING id INTO :id"
 
     def save(self) -> 'Model':
 
@@ -298,6 +328,7 @@ class Model(Query):
         else:
             log_info("Atualizando registro")
             sql = self._create_update_sql()
+
         id_var = Model.cursor.var(int)
         try:
             Model.execute_sql(sql, id=id_var)

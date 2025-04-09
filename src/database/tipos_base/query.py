@@ -35,7 +35,8 @@ class Query(Database):
         cursor = cls.cursor
         cursor.execute(sql)
         result = cursor.fetchall()
-        return [cls.from_dict(dict(zip([col[0] for col in cursor.description], row))) for row in result]
+
+        return [cls.from_dict(dict(zip([cls.field_from_db(col[0]) for col in cursor.description], row))) for row in result]
 
     @classmethod
     def fetch_by_id(cls, id:int) -> 'Model':
@@ -44,7 +45,7 @@ class Query(Database):
         cursor = cls.cursor
         cursor.execute(sql)
         result = cursor.fetchall()
-        return cls.from_dict(dict(zip([col[0] for col in cursor.description], result[0])))
+        return cls.from_dict(dict(zip([cls.field_from_db(col[0]) for col in cursor.description], result[0])))
 
     @classmethod
     def filter_by_field(cls, field:str, value) -> '_Query':

@@ -56,3 +56,7 @@ class Database(ABC):
     def table_name(cls) -> str:
         '''Retorna o nome da tabela referente a esta dataclass na oracladb'''
         return cls.__name__.upper()
+
+    @classmethod
+    def colum_name(cls, field_name:str) -> str:
+        return field_name.upper()
