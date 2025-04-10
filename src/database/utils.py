@@ -26,15 +26,19 @@ def input_bool(field_name:str, old_value:bool|None=None, *,
     if value.strip() == '' and old_value is not None:
         return old_value
 
-    opcoes = ['v', 'verdadeiro', 'true', 's', 'sim', 'f', 'falso', 'false', 'n', 'não', 'nao', 'no']
+    verdadeiro = ['v', 'verdadeiro', '[v]erdadeiro', 'true', 's', 'sim', '[s]im', 'yes']
 
-    if value.lower().strip() in opcoes:
-        return  value.lower().strip() in ['v', 'verdadeiro', 'true', 's', 'sim']
+    falso = ['f', 'false', '[f]alse', 'n', 'não', '[n]ão', 'nao', '[n]ao', 'no']
 
-    if modo == 'V':
-        raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado [V]erdadeiro/[F]also")
+    if value.lower().strip() in verdadeiro:
+        return True
+    elif value.lower().strip() in falso:
+        return False
     else:
-        raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado [S]im/[N]ão")
+        if modo == 'V':
+            raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado [V]erdadeiro/[F]also")
+        else:
+            raise ValueError(f"Valor inválido para {field_name}: {value}. Esperado [S]im/[N]ão")
 
 def input_int(field_name:str, old_value:int|None=None, message_override:str=None) -> int:
     """

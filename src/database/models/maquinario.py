@@ -4,6 +4,9 @@ from src.database.models.fazenda import Fazenda
 from src.database.tipos_base.model import Model
 from dataclasses import dataclass, field
 import matplotlib.pyplot as plt
+from datetime import datetime
+from src.logger.loggers import log_success
+
 
 @dataclass(frozen=True, eq=True)
 class Maquinario(Model):
@@ -80,7 +83,13 @@ class Maquinario(Model):
         else:
             raise NotImplementedError(f"Formato {fazenda.formato.name} não implementado")
 
-    def calcular_distancia(cls, rota: list[tuple]) -> float:
+    def calcular_e_salvar_rota(self, fazenda:Fazenda):
+        """Calcula a rota e salva a imagem."""
+        rota = self.calcular_rota(fazenda)
+        self.desenhar_rota(rota, titulo=f"Rota {self.nome} - {fazenda.nome}")
+        return rota
+
+    def calcular_distancia(self, rota: list[tuple]) -> float:
         """Calcula a distância total percorrida com base na rota."""
         distancia_total = 0.0
         for i in range(1, len(rota)):
@@ -89,36 +98,43 @@ class Maquinario(Model):
             distancia_total += ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 1/2
         return distancia_total
 
-    def calcular_consumo(cls, distancia: float, consumo_por_km: float) -> float:
+    def calcular_consumo(self, distancia: float, consumo_por_km: float) -> float:
         """Calcula o consumo de combustível com base na distância e eficiência."""
         if consumo_por_km <= 0:
             raise ValueError("O consumo por km deve ser maior que zero.")
         return distancia / consumo_por_km
 
-def desenhar_rota(rota, titulo="Rota"):
-    """Desenha a rota em um gráfico."""
-    x, y = zip(*rota)  # Separa as coordenadas x e y
+    @staticmethod
+    def desenhar_rota(rota, titulo="Rota"):
+        """Desenha a rota em um gráfico."""
+        x, y = zip(*rota)  # Separa as coordenadas x e y
 
-    plt.figure(figsize=(8, 8))
-    plt.plot(x, y, marker='o', linestyle='-', color='blue')  # Desenha a rota
-    plt.title(titulo)
-    plt.xlabel("X (m)")
-    plt.ylabel("Y (m)")
-    plt.grid(True)
-    plt.show()
+        plt.figure(figsize=(8, 8))
+        plt.plot(x, y, marker='o', linestyle='-', color='blue')  # Desenha a rota
+        plt.title(titulo)
+        plt.xlabel("X (m)")
+        plt.ylabel("Y (m)")
+        plt.grid(True)
+        now = datetime.now()
+
+        filename = f"{titulo}_{now.strftime('%Y%m%d_%H%M%S')}.png"
+        plt.savefig(filename)
+        plt.close()
+
+        log_success(f"Rota salva no arquivo: {filename}")
 
 
 if __name__ == "__main__":
 
-    rota_exemplo = [
-        (0, 0), (10, 0), (10, 2), (0, 2), (0, 4), (10, 4)
-    ]
-
-    print("Rota calculada:")
-    for ponto in rota_exemplo:
-        print(ponto)
-
-    desenhar_rota(rota_exemplo, titulo="Rota Exemplo")
+    # rota_exemplo = [
+    #     (0, 0), (10, 0), (10, 2), (0, 2), (0, 4), (10, 4)
+    # ]
+    #
+    # print("Rota calculada:")
+    # for ponto in rota_exemplo:
+    #     print(ponto)
+    #
+    # desenhar_rota(rota_exemplo, titulo="Rota Exemplo")
 
     iniciar_database()
 
@@ -128,4 +144,5 @@ if __name__ == "__main__":
     rota = maquinario.calcular_rota(fazenda)
 
     print("Rota calculada:")
-    desenhar_rota(rota)
+    maquinario.desenhar_rota(rota)
+    pass
