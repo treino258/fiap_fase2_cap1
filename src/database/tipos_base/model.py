@@ -1,4 +1,4 @@
-from dataclasses import dataclass, fields, field, asdict, InitVar
+from dataclasses import dataclass, fields, field, asdict, InitVar, MISSING
 from enum import Enum
 from typing import get_type_hints, Union, ClassVar
 import json
@@ -135,6 +135,46 @@ class Model(Query):
     def from_json(cls, json_str: str):
         data = json.loads(json_str)
         return cls.from_dict(data)
+
+    @classmethod
+    def exemple_instance(cls):
+        """
+        Retorna uma instância da dataclass com os valores padrão
+        """
+        data = {}
+        for field in fields(cls):
+
+            if field.name == 'id':
+                continue
+
+            if field.default is not None and field.default is not MISSING:
+                data[field.name] = field.default
+
+            elif field.default_factory is not None and field.default_factory is not MISSING:
+                data[field.name] = field.default_factory()
+
+            elif field.type is Enum or issubclass(field.type, Enum):
+                data[field.name] = list(field.type)[0]
+
+            elif field.type is bool or issubclass(field.type, bool):
+                data[field.name] = True
+
+            elif field.type is int or issubclass(field.type, int):
+                data[field.name] = 99
+
+            elif field.type is float or issubclass(field.type, float):
+
+                data[field.name] = 99.99
+
+            elif field.type is str or issubclass(field.type, str):
+
+                data[field.name] = 'Valor exemplo'
+
+            else:
+                raise NotImplementedError(f'Campo {field.name} não possui valor padrão implementado')
+
+        return cls.from_dict(data)
+
 
     #------------- METHODS ---------------------
 

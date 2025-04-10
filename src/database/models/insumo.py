@@ -40,4 +40,7 @@ class Insumo(Model):
 if __name__ == "__main__":
     # iniciar_database()
     # Insumo.drop_table()
-    pass
+
+    instance = Insumo.exemple_instance()
+
+    print(instance)
