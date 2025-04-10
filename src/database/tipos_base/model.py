@@ -197,8 +197,8 @@ class Model(Query):
     def to_dict(self) -> dict:
         return asdict(self)
 
-    def to_json(self):
-        return  json.dumps(self.to_dict())
+    def to_json(self, indent = 4):
+        return  json.dumps(self.to_dict(), indent=indent)
 
     @classmethod
     def fields(cls):
@@ -415,7 +415,13 @@ class Model(Query):
         try:
             Model.execute_sql(sql, id=id_var)
             log_success(f"Registro salvo com sucesso")
-            novo_id = id_var.getvalue()[0]
+
+            values = id_var.getvalue()
+
+            if len(values) == 0:
+                raise Exception(f"Falha ao salvar registro, id não encontrado")
+
+            novo_id = values[0]
             return self.copy_with({'id': novo_id})
 
         except Exception as e:

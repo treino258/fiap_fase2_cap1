@@ -21,4 +21,4 @@ def listar_generico(model:type[Model]):
     print()
     print(data_frame)
     print()
-    input("Pressione qualquer tecla para continuar...")
+    input("Pressione qualquer ENTER para continuar...")

@@ -31,7 +31,7 @@ class Query(Database):
     def fetch_all(cls) -> list['Model']:
         '''Retorna todos os registros da tabela referente a esta dataclass na oracladb'''
         table_name = cls.table_name()
-        sql = f"SELECT * FROM {table_name}"
+        sql = f"SELECT * FROM {table_name} ORDER BY id"
         cursor = cls.cursor
         cursor.execute(sql)
         result = cursor.fetchall()

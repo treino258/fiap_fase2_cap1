@@ -3,9 +3,10 @@ from src.database.utils import input_bool
 from src.logger.loggers import log_warning, log_info, log_error, log_success
 from datetime import datetime
 import json
+from src.settings import EXPORTS_DIR
 
 
-def exportar_generico(
+def exportar_json_generico(
     model: type[Model],
 ):
 
@@ -31,7 +32,7 @@ def exportar_generico(
 
     now = datetime.now()
 
-    nome_arquivo = f"{model.display_name_plural()}-{now.strftime('%Y-%m-%d_%H-%M-%S')}.json"
+    nome_arquivo = f"{EXPORTS_DIR}/{model.display_name_plural()}-{now.strftime('%Y-%m-%d_%H-%M-%S')}.json"
 
     log_info(f"Exportando dados para o arquivo {nome_arquivo}...")
 
