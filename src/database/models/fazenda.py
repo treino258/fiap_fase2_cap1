@@ -1,3 +1,4 @@
+from src.database.login.iniciar_database import iniciar_database
 from src.database.models.compartilhado import TipoCultura, FormatoArea
 from src.database.tipos_base.model import Model
 from dataclasses import dataclass, field
@@ -38,15 +39,21 @@ class Fazenda(Model):
 
 if __name__ == "__main__":
 
-    print(Fazenda._create_table_sql())
-    x = Fazenda.from_dict({
-        'nome': 'Fazenda Teste',
-        'tipo': 'cana',
-        'formato': 'triangulo',
-        'base': 10.0,
-        'altura': 5.0
-    })
-    print(x.fields())
-    print(x)
+    # print(Fazenda._create_table_sql())
+    # x = Fazenda.from_dict({
+    #     'nome': 'Fazenda Teste',
+    #     'tipo': 'cana',
+    #     'formato': 'triangulo',
+    #     'base': 10.0,
+    #     'altura': 5.0
+    # })
+    # print(x.fields())
+    # print(x)
+    #
+    # y = Fazenda.from_terminal_input()
 
-    y = Fazenda.from_terminal_input()
+    iniciar_database()
+
+    instances = Fazenda.filter_by_field('nome', 'fazenda teste 2').fetch()
+
+    print(instances)

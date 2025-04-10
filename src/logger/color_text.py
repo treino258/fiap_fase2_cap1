@@ -1,7 +1,7 @@
 def makeRed(text:str) -> str:
     return "\033[91m" + text + "\033[0m"
 
-def makeMagenta(text:str) -> str:
+def makePink(text:str) -> str:
     return "\033[95m" + text + "\033[0m"
 
 def makeGreen(text:str) -> str:
@@ -18,3 +18,13 @@ def makeCyan(text:str) -> str:
 
 def makeOrange(text:str) -> str:
     return "\033[38;5;208m" + text + "\033[0m"
+
+if __name__ == "__main__":
+
+    print(makeRed("Vermelho"))
+    print(makePink("Rosa"))
+    print(makeGreen("Verde"))
+    print(makeYellow("Amarelo"))
+    print(makeBlue("Azul"))
+    print(makeCyan("Ciano"))
+    print(makeOrange("Laranja"))

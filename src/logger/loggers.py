@@ -1,7 +1,7 @@
 from enum import StrEnum
 from datetime import datetime
 
-from src.logger.color_text import makeRed, makeYellow, makeBlue, makeCyan, makeMagenta, makeGreen
+from src.logger.color_text import makeRed, makeYellow, makeBlue, makeCyan, makePink, makeGreen
 
 
 class LEVEL(StrEnum):
@@ -37,7 +37,7 @@ def log(message: str, level: LEVEL, *, time:datetime|None = None, silent:bool = 
                 print(makeCyan(logmessage))
 
             case LEVEL.CRITICAL:
-                print(makeMagenta(logmessage))
+                print(makePink(logmessage))
 
             case LEVEL.SUCCESS:
                 print(makeGreen(logmessage))

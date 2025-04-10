@@ -4,12 +4,12 @@ from src.database.tipos_base.database import Database
 class _Query(Database):
 
     def __init__(self, filters: list[str] = None, *,
-                 model: 'Model',
+                 model: type['Model'],
                  table_name: str,
                  ):
         self.filters:ClassVar[list[str]] = filters or []
         self.target_table_name:ClassVar[str] = table_name
-        self.model:ClassVar['Model'] = model
+        self.model:ClassVar[type['Model']] = model
 
     def filter_by_field(self, field: str, value) -> '_Query':
         '''Adiciona um filtro à lista de filtros'''
@@ -24,7 +24,7 @@ class _Query(Database):
         cursor = self.cursor
         cursor.execute(sql)
         result = cursor.fetchall()
-        return [self.model.from_dict(dict(zip([col[0] for col in cursor.description], row))) for row in result]
+        return [self.model.from_dict(dict(zip([self.model.field_from_db(col[0]) for col in cursor.description], row))) for row in result]
 
 class Query(Database):
     @classmethod
