@@ -26,6 +26,13 @@
 
 Este projeto visa modelar um banco de dados relacional para a FarmTech Solutions. O objetivo é armazenar e analisar dados coletados por sensores em plantações (umidade, pH, nutrientes P e K) para otimizar a aplicação de água e nutrientes, visando aumentar a produção agrícola.
 
+O banco de dados deve permitir responder perguntas como:
+* Qual foi a quantidade total de água aplicada em cada mês, por campo?
+* Como variou o nível de pH do solo em um campo específico ao longo do ano?
+* Quais campos apresentaram níveis de nutrientes (P ou K) fora do ideal para a cultura atual?
+* Qual o histórico de leituras de um sensor específico?
+* Quais sensores estão ativos e onde estão instalados?
+
 
 ## 📁 Estrutura de pastas
 
