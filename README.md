@@ -114,7 +114,7 @@ O diagrama visual abaixo representa a estrutura final do banco de dados:
 ## Script SQL (DDL)
 
 O script para criação das tabelas no banco de dados Oracle (ou outro SGBD) pode ser encontrado neste arquivo:
-[FarmTech_Schema.ddl](FarmTech_Schema.ddl)
+[FarmTech_Schema.ddl](assets/FarmTech_Schema.ddl)
 
 ## 📁 Estrutura de pastas
 
