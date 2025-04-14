@@ -33,6 +33,83 @@ O banco de dados deve permitir responder perguntas como:
 * Qual o histórico de leituras de um sensor específico?
 * Quais sensores estão ativos e onde estão instalados?
 
+## 📜 Modelo Entidade-Relacionamento (MER)
+
+### Entidades e Atributos
+
+* **Propriedade**
+    * `id_propriedade`: Integer (PK, Not Null)
+    * `nome_propriedade`: VARCHAR(100)
+
+* **Campo** (Representa o Talhão/Lote)
+    * `id_campo`: Integer (PK, Not Null)
+    * `id_propriedade`: Integer (FK, Not Null) - Ref: Propriedade
+    * `identificador`: VARCHAR(100) (Unique, Not Null)
+    * `area_hectares`: NUMERIC
+    * `localizacao_geo`: SDO_GEOMETRY (ou VARCHAR)
+
+* **TipoSensor**
+    * `id_tipo_sensor`: Integer (PK, Not Null)
+    * `nome`: VARCHAR(100) (Not Null)
+    * `unidade_medida`: VARCHAR(20) (Not Null)
+
+* **Sensor**
+    * `id_sensor`: Integer (PK, Not Null)
+    * `id_tipo_sensor`: Integer (FK, Not Null) - Ref: TipoSensor
+    * `id_campo`: Integer (FK, Not Null) - Ref: Campo
+    * `codigo_identificacao`: VARCHAR(100) (Unique, Not Null)
+    * `data_instalacao`: DATE (Not Null)
+    * `status`: VARCHAR(20) (Not Null)
+
+* **LeituraSensor**
+    * `id_leitura`: Integer (PK, Not Null)
+    * `id_sensor`: Integer (FK, Not Null) - Ref: Sensor
+    * `data_hora_leitura`: TIMESTAMP (Not Null)
+    * `valor_lido`: NUMERIC(12, 4) (Not Null)
+
+* **Cultura**
+    * `id_cultura`: Integer (PK, Not Null)
+    * `nome`: VARCHAR(100) (Not Null)
+    * `nome_cientifico`: VARCHAR(150) (Opcional)
+
+* **Plantio** (Entidade Associativa: Campo <-> Cultura)
+    * `id_plantio`: Integer (PK, Not Null)
+    * `id_campo`: Integer (FK, Not Null) - Ref: Campo
+    * `id_cultura`: Integer (FK, Not Null) - Ref: Cultura
+    * `data_inicio_plantio`: DATE (Not Null)
+    * `data_fim_plantio`: DATE
+
+* **TipoAjuste**
+    * `id_tipo_ajuste`: Integer (PK, Not Null)
+    * `descricao`: VARCHAR(100) (Not Null)
+    * `unidade_medida`: VARCHAR(20) (Not Null)
+
+* **AjusteAplicacao**
+    * `id_ajuste`: Integer (PK, Not Null)
+    * `id_campo`: Integer (FK, Not Null) - Ref: Campo
+    * `id_tipo_ajuste`: Integer (FK, Not Null) - Ref: TipoAjuste
+    * `data_hora_ajuste`: TIMESTAMP (Not Null)
+    * `quantidade_aplicada`: NUMERIC (Not Null)
+    * `observacoes`: VARCHAR(500) (Opcional)
+
+*(Adapte os tipos VARCHAR, NUMERIC etc. se usou outros)*
+
+### Relacionamentos Principais
+
+* Propriedade (1) -- (0,N) Campo
+* Campo (1) -- (0,N) Sensor
+* Campo (1) -- (0,N) Plantio
+* Campo (1) -- (0,N) AjusteAplicacao
+* TipoSensor (1) -- (0,N) Sensor
+* Sensor (1) -- (0,N) LeituraSensor
+* Cultura (1) -- (0,N) Plantio
+* TipoAjuste (1) -- (0,N) AjusteAplicacao
+
+## 4. Diagrama Entidade-Relacionamento (DER)
+
+O diagrama visual abaixo representa a estrutura final do banco de dados:
+
+
 
 ## 📁 Estrutura de pastas
 
