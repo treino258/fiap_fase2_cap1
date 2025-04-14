@@ -6,9 +6,7 @@
 
 <br>
 
-# Nome do projeto
-
-## Nome do grupo
+# Um mapa do tesouro
 
 ## 👨‍🎓 Integrantes: 
 - <a href="https://www.linkedin.com/company/inova-fusca">Nome do integrante 1</a>
@@ -26,7 +24,7 @@
 
 ## 📜 Descrição
 
-*Descreva seu projeto com base no texto do PBL (até 600 palavras)*
+Este projeto visa modelar um banco de dados relacional para a FarmTech Solutions. O objetivo é armazenar e analisar dados coletados por sensores em plantações (umidade, pH, nutrientes P e K) para otimizar a aplicação de água e nutrientes, visando aumentar a produção agrícola.
 
 
 ## 📁 Estrutura de pastas
