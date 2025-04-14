@@ -11,11 +11,11 @@
 ## Grupo 28
 
 ## 👨‍🎓 Integrantes: 
--  Vitor Albuquerque Bezerra da Silva
--  Lucas Basseto Francelino
--  Alice Caroline Marinho de Assis 
--  Pedro Lucas Tostes Silva 
--  Leonardo Sampaio Souza
+-  Vitor Albuquerque Bezerra da Silva - RM: 563001
+-  Lucas Basseto Francelino - RM: 561409
+-  Alice Caroline Marinho de Assis - RM: 566233
+-  Pedro Lucas Tostes Silva - RM: 561644
+-  Leonardo Sampaio Souza - RM: 563928 
 
 ## 👩‍🏫 Professores:
 ### Tutor(a) 
@@ -115,7 +115,7 @@ O diagrama visual abaixo representa a estrutura final do banco de dados:
 
 ## Script SQL (DDL)
 
-O script para criação das tabelas no banco de dados Oracle (ou outro SGBD) pode ser encontrado neste arquivo:
+O script para criação das tabelas no banco de dados Oracle, pode ser encontrado neste arquivo:
 [FarmTech_Schema.ddl](assets/FarmTech_Schema.ddl)
 
 ## 📁 Estrutura de pastas
