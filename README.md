@@ -8,18 +8,20 @@
 
 # Um mapa do tesouro
 
+## Grupo 28
+
 ## 👨‍🎓 Integrantes: 
-- <a href="https://www.linkedin.com/company/inova-fusca">Nome do integrante 1</a>
-- <a href="https://www.linkedin.com/company/inova-fusca">Nome do integrante 2</a>
-- <a href="https://www.linkedin.com/company/inova-fusca">Nome do integrante 3</a> 
-- <a href="https://www.linkedin.com/company/inova-fusca">Nome do integrante 4</a> 
-- <a href="https://www.linkedin.com/company/inova-fusca">Nome do integrante 5</a>
+-  Vitor Albuquerque Bezerra da Silva
+-  Lucas Basseto Francelino
+-  Alice Caroline Marinho de Assis 
+-  Pedro Lucas Tostes Silva 
+-  Leonardo Sampaio Souza
 
 ## 👩‍🏫 Professores:
 ### Tutor(a) 
 - <a href="https://www.linkedin.com/company/inova-fusca">Nome do Tutor</a>
 ### Coordenador(a)
-- <a href="https://www.linkedin.com/company/inova-fusca">Nome do Coordenador</a>
+- <a href="https://www.linkedin.com/company/inova-fusca">André Godoi</a>
 
 
 ## 📜 Descrição
