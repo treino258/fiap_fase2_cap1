@@ -105,17 +105,16 @@ O banco de dados deve permitir responder perguntas como:
 * Cultura (1) -- (0,N) Plantio
 * TipoAjuste (1) -- (0,N) AjusteAplicacao
 
-## 4. Diagrama Entidade-Relacionamento (DER)
+## Diagrama Entidade-Relacionamento (DER)
 
 O diagrama visual abaixo representa a estrutura final do banco de dados:
 
 <img src="assets/FarmTech.PNG">
 
-## 4. Diagrama Entidade-Relacionamento (DER)
+## Script SQL (DDL)
 
-O diagrama visual abaixo representa a estrutura final do banco de dados:
-
-![Diagrama DER do Projeto FarmTech](image_a02664.png)
+O script para criação das tabelas no banco de dados Oracle (ou outro SGBD) pode ser encontrado neste arquivo:
+[FarmTech_Schema_Final.sql](FarmTech_Schema.ddl)
 
 ## 📁 Estrutura de pastas
 
