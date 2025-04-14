@@ -109,6 +109,7 @@ O banco de dados deve permitir responder perguntas como:
 
 O diagrama visual abaixo representa a estrutura final do banco de dados:
 
+<img src="assets/FarmTech.PNG">
 
 
 ## 📁 Estrutura de pastas
