@@ -111,6 +111,11 @@ O diagrama visual abaixo representa a estrutura final do banco de dados:
 
 <img src="assets/FarmTech.PNG">
 
+## 4. Diagrama Entidade-Relacionamento (DER)
+
+O diagrama visual abaixo representa a estrutura final do banco de dados:
+
+![Diagrama DER do Projeto FarmTech](image_a02664.png)
 
 ## 📁 Estrutura de pastas
 
