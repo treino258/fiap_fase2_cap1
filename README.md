@@ -102,11 +102,13 @@ O banco de dados deve permitir responder perguntas como:
 * Cultura (1) -- (0,N) Plantio
 * TipoAjuste (1) -- (0,N) AjusteAplicacao
 
-## Diagrama Entidade-Relacionamento (DER)
+## Diagrama Entidade-Relacionamento 
 
 O diagrama visual abaixo representa a estrutura final do banco de dados:
 
 <img src="assets/FarmTech.PNG">
+
+<img src="assets/FarmTechDER.PNG">
 
 ## Script SQL (DDL)
 
