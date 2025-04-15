@@ -125,7 +125,7 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 
 ## 🔧 Como executar o código
 
-*Importar o arquivo assets/FarmTech_Schema.ddl no Oracle Data Modeler.*
+*Importar o arquivo [FarmTech_Schema.ddl](assets/FarmTech_Schema.ddl) no Oracle Data Modeler.*
 
 
 ## 🗃 Histórico de lançamentos
