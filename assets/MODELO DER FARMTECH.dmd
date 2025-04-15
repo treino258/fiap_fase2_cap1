@@ -2,7 +2,7 @@
 <OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="MODELO DER FARMTECH" id="48E12AC7-51AA-C0FD-83CC-C190F5FC0F22" version="3.5">
 <createdBy>tomat</createdBy>
 <createdTime>2025-04-10 12:33:31 UTC</createdTime>
-<ownerDesignName>MODELO DER FARMTECH</ownerDesignName>
+<ownerDesignName>FarmTech_Schema</ownerDesignName>
 <capitalNames>false</capitalNames>
 <designId>48E12AC7-51AA-C0FD-83CC-C190F5FC0F22</designId>
 </OSDM_Design>
