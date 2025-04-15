@@ -11,12 +11,7 @@
 ## Grupo 28
 
 ## 👨‍🎓 Integrantes: 
--  Vitor Albuquerque Bezerra da Silva - RM: 563001
--  Lucas Basseto Francelino - RM: 561409
--  Alice Caroline Marinho de Assis - RM: 566233
--  Pedro Lucas Tostes Silva - RM: 561644
--  Leonardo Sampaio Souza - RM: 563928 
-
+- Vide arquivo separado na entrega no sistema da FIAP
 ## 👩‍🏫 Professores:
 ### Tutor(a) 
 - <a href="https://www.linkedin.com/company/inova-fusca">Nome do Tutor</a>
