@@ -1,5 +1,5 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="MODELO DER FARMTECH" id="48E12AC7-51AA-C0FD-83CC-C190F5FC0F22" version="3.5">
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="FarmTech_Schema" id="48E12AC7-51AA-C0FD-83CC-C190F5FC0F22" version="3.5">
 <createdBy>tomat</createdBy>
 <createdTime>2025-04-10 12:33:31 UTC</createdTime>
 <ownerDesignName>FarmTech_Schema</ownerDesignName>
