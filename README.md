@@ -254,6 +254,8 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 
 ## 🗃 Histórico de lançamentos
 
+* 0.1.1 - 16/04/2024
+
 * 0.1.0 - 14/04/2024
     *
 
