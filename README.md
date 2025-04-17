@@ -23,87 +23,99 @@
 
 Este projeto visa modelar um banco de dados relacional para a FarmTech Solutions. O objetivo é armazenar e analisar dados coletados por sensores em plantações (umidade, pH, nutrientes P e K) para otimizar a aplicação de água e nutrientes, visando aumentar a produção agrícola.
 
+O banco de dados deve suprir as seguintes necessidades:
+
+* **O produtor planta diferentes culturas que requerem monitoramento contínuo**  
+  - Tabelas: `plantio`, `campo`, `cultura`.  
+  - Atributos:  
+    - `plantio.campo_id_campo`: Relaciona o plantio ao campo.  
+    - `plantio.cultura_id_cultura`: Relaciona o plantio à cultura.  
+    - `plantio.data_inicio` e `plantio.data_fim`: Determinam o período de monitoramento.  
+    - `campo.identificador`: Identifica o campo monitorado.  
+    - `cultura.nome`: Nome da cultura plantada.  
+
+* **Sensores coletam dados em tempo real e enviam para um sistema central.**  
+  - Tabelas: `sensor`, `leiturasensor`, `tiposensor`.  
+  - Atributos:  
+    - `sensor.codigo_indetificacao`: Identifica o sensor.  
+    - `sensor.localizacao`: Localização do sensor no campo.  
+    - `leiturasensor.data_hora_leitura`: Registra o momento da leitura.  
+    - `leiturasensor.valor_lido`: Valor coletado pelo sensor.  
+    - `tiposensor.nome`: Tipo de dado coletado (ex: umidade, pH).  
+
+* **O sistema processa os dados e sugere ajustes na irrigação e aplicação de nutrientes.**  
+  - Tabelas: `leiturasensor`, `irrigacao`, `aplicacao_nutrientes`.  
+  - Atributos:  
+    - `leiturasensor.valor_lido`: Dados coletados para análise.  
+    - `irrigacao.quantidade_total`: Quantidade de água aplicada.  
+    - `aplicacao_nutrientes.quantidade_aplicada`: Quantidade de nutrientes aplicados.  
+    - `aplicacao_nutrientes.data_hora`: Momento da aplicação.  
+
+* **Com base nos dados históricos, o sistema pode prever necessidades futuras e otimizar os recursos.**  
+  - Tabelas: `leiturasensor`, `irrigacao`, `aplicacao_nutrientes`.  
+  - Atributos:  
+    - `leiturasensor.data_hora_leitura`: Histórico de leituras.  
+    - `irrigacao.inicio` e `irrigacao.fim`: Histórico de irrigações.  
+    - `aplicacao_nutrientes.data_hora`: Histórico de aplicações de nutrientes.  
+    - `leiturasensor.valor_lido`: Dados históricos para análise preditiva.  
+
 O banco de dados deve permitir responder perguntas como:
 
-* **Qual foi a quantidade total de água aplicada em cada mês, por campo?**  
-  A consulta SQL utiliza as tabelas `irrigacao`, `plantio` e `campo`, agrupando os dados por campo e mês para calcular o total de água aplicada:
-  ```sql
-  SELECT 
-      c.identificador AS campo,
-      TO_CHAR(i.inicio, 'YYYY-MM') AS mes,
-      SUM(i.quantidade_total) AS total_agua
-  FROM 
-      irrigacao i
-  JOIN plantio p ON i.plantio_id_plantio = p.id_plantio
-  JOIN campo c ON p.campo_id_campo = c.id_campo
-  GROUP BY c.identificador, TO_CHAR(i.inicio, 'YYYY-MM');
-  ```
+* **Qual foi a data e hora da última aplicação de água?**  
+  - **Tabelas**: `irrigacao`.  
+  - **Atributos**:  
+    - `irrigacao.fim`: Data e hora do fim da irrigação.  
+    - `irrigacao.inicio`: Caso `fim` seja nulo, considerar o início da irrigação.  
+  - **Consulta**: Ordenar pela coluna `fim` (ou `inicio` se `fim` for nulo) em ordem decrescente e selecionar o primeiro registro.
 
-* **Como variou o nível de pH do solo em um campo específico ao longo do ano?**  
-  A consulta SQL utiliza as tabelas `leiturasensor`, `sensor`, `plantio` e `campo`, filtrando pelo tipo de sensor "pH" e agrupando por mês:
-  ```sql
-  SELECT 
-      TO_CHAR(ls.data_hora_leitura, 'YYYY-MM') AS mes,
-      AVG(ls.valor_lido) AS media_ph
-  FROM 
-      leiturasensor ls
-  JOIN sensor s ON ls.sensor_id_sensor = s.id_sensor
-  JOIN plantio p ON ls.plantio_id_plantio = p.id_plantio
-  JOIN campo c ON p.campo_id_campo = c.id_campo
-  WHERE 
-      s.tiposensor_id_tipo_sensor = (SELECT id_tipo_sensor FROM tiposensor WHERE nome = 'pH')
-      AND c.identificador = 'Campo Norte'
-  GROUP BY TO_CHAR(ls.data_hora_leitura, 'YYYY-MM');
-  ```
+* **Qual foi a quantidade total de água aplicada em cada mês, por campo?**  
+  - **Tabelas**: `irrigacao`, `plantio`, `campo`.  
+  - **Atributos**:  
+    - `irrigacao.quantidade_total`: Quantidade de água aplicada.  
+    - `irrigacao.inicio`: Data da aplicação (para agrupar por mês).  
+    - `plantio.campo_id_campo`: Relaciona a irrigação ao campo.  
+    - `campo.identificador`: Identificador do campo.  
+  - **Consulta**: Agrupar por campo e mês, somando a coluna `quantidade_total`.
+
+* **Como variou o nível de pH do solo num campo específico ao longo do ano?**  
+  - **Tabelas**: `leiturasensor`, `sensor`, `tiposensor`, `plantio`, `campo`.  
+  - **Atributos**:  
+    - `leiturasensor.data_hora_leitura`: Data e hora da leitura.  
+    - `leiturasensor.valor_lido`: Valor do pH lido.  
+    - `sensor.tiposensor_id_tipo_sensor`: Relaciona o sensor ao tipo de sensor.  
+    - `tiposensor.nome`: Nome do tipo de sensor (filtrar por "pH").  
+    - `plantio.campo_id_campo`: Relaciona a leitura ao campo.  
+    - `campo.identificador`: Identificador do campo.  
+  - **Consulta**: Filtrar por campo e tipo de sensor "pH", agrupar por mês e calcular a média dos valores lidos.
 
 * **Quais campos apresentaram níveis de nutrientes (P ou K) fora do ideal para a cultura atual?**  
-  A consulta SQL utiliza as tabelas `leiturasensor`, `sensor`, `plantio`, `campo` e `cultura`, filtrando pelos sensores de nutrientes P e K e comparando com os níveis ideais:
-  ```sql
-  SELECT 
-      c.identificador AS campo,
-      t.nome AS nutriente,
-      ls.valor_lido AS valor_atual,
-      'Nível fora do ideal' AS status
-  FROM 
-      leiturasensor ls
-  JOIN sensor s ON ls.sensor_id_sensor = s.id_sensor
-  JOIN tiposensor t ON s.tiposensor_id_tipo_sensor = t.id_tipo_sensor
-  JOIN plantio p ON ls.plantio_id_plantio = p.id_plantio
-  JOIN campo c ON p.campo_id_campo = c.id_campo
-  JOIN cultura cu ON p.cultura_id_cultura = cu.id_cultura
-  WHERE 
-      t.nome IN ('Nutriente P', 'Nutriente K')
-      AND (ls.valor_lido < 10 OR ls.valor_lido > 50); -- Exemplo de níveis ideais
-  ```
+  - **Tabelas**: `leiturasensor`, `sensor`, `tiposensor`, `plantio`, `campo`, `cultura`.  
+  - **Atributos**:  
+    - `leiturasensor.valor_lido`: Valor do nutriente lido.  
+    - `sensor.tiposensor_id_tipo_sensor`: Relaciona o sensor ao tipo de sensor.  
+    - `tiposensor.nome`: Nome do tipo de sensor (filtrar por "Nutriente P" ou "Nutriente K").  
+    - `plantio.campo_id_campo`: Relaciona a leitura ao campo.  
+    - `campo.identificador`: Identificador do campo.  
+    - `plantio.cultura_id_cultura`: Relaciona o plantio à cultura.  
+    - `cultura.nome`: Nome da cultura (para determinar os níveis ideais).  
+  - **Consulta**: Filtrar por tipo de sensor "Nutriente P" ou "Nutriente K" e comparar os valores lidos com os níveis ideais da cultura.
 
 * **Qual o histórico de leituras de um sensor específico?**  
-  A consulta SQL utiliza a tabela `leiturasensor` e filtra pelo ID ou código do sensor:
-  ```sql
-  SELECT 
-      ls.data_hora_leitura,
-      ls.valor_lido,
-      um.nome AS unidade_medida
-  FROM 
-      leiturasensor ls
-  JOIN sensor s ON ls.sensor_id_sensor = s.id_sensor
-  JOIN unidade_medida um ON ls.unidade_medida_id_unidade = um.id_unidade
-  WHERE 
-      s.codigo_indetificacao = 'SENSOR123'
-  ORDER BY ls.data_hora_leitura;
-  ```
+  - **Tabelas**: `leiturasensor`, `sensor`, `unidade_medida`.  
+  - **Atributos**:  
+    - `leiturasensor.data_hora_leitura`: Data e hora da leitura.  
+    - `leiturasensor.valor_lido`: Valor lido pelo sensor.  
+    - `sensor.codigo_indetificacao`: Código de identificação do sensor.  
+    - `unidade_medida.nome`: Unidade de medida do valor lido.  
+  - **Consulta**: Filtrar por código de identificação do sensor e ordenar por `data_hora_leitura`.
 
 * **Quais sensores estão ativos e onde estão instalados?**  
-  A consulta SQL utiliza a tabela `sensor` e filtra pelos sensores com localização definida:
-  ```sql
-  SELECT 
-      s.codigo_indetificacao AS sensor,
-      s.localizacao AS coordenadas,
-      s.data_instalacao
-  FROM 
-      sensor s
-  WHERE 
-      s.localizacao IS NOT NULL;
-  ```
+  - **Tabelas**: `sensor`.  
+  - **Atributos**:  
+    - `sensor.codigo_indetificacao`: Código de identificação do sensor.  
+    - `sensor.localizacao`: Localização geográfica do sensor.  
+    - `sensor.data_instalacao`: Data de instalação do sensor.  
+  - **Consulta**: Filtrar sensores com localização não nula e listar os atributos mencionados.
 
 ## Diagrama Entidade-Relacionamento (DER)
 
@@ -228,31 +240,26 @@ A imagem abaixo representa o modelo entidade-relacionamento (MER) do banco de da
 * **nutriente** (1) -- (0,N) **aplicacao_nutrientes**  
   Um nutriente pode ser usado em zero ou mais aplicações de nutrientes, mas cada aplicação de nutrientes utiliza exatamente um nutriente.
 
+
 ## 
-
-## Script SQL (DDL)
-
-O script para criação das tabelas no banco de dados Oracle, pode ser encontrado neste arquivo:
-[FarmTech_Schema.ddl](assets/FarmTech_Schema.ddl)
-
-Casos precise do arquivo dmd:
-[FarmTech.dmd](assets/FarmTech.dmd)
-## 📁 Estrutura de pastas
-
-Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
-
-- <b>.github</b>: Nesta pasta ficarão os arquivos de configuração específicos do GitHub que ajudam a gerenciar e automatizar processos no repositório.
-
-- <b>assets</b>: aqui estão os arquivos relacionados a elementos não-estruturados deste repositório, como imagens.
-
-- <b>README.md</b>: arquivo que serve como guia e explicação geral sobre o projeto (o mesmo que você está lendo agora).
 
 ## 🔧 Como executar o código
 
-*Importar o arquivo [FarmTech_Schema.ddl](assets/FarmTech_Schema.ddl) no Oracle Data Modeler.*
+Existem duas maneiras de executar o código:
+
+### 🛠️ Maneira 1:
+1. Baixe o arquivo [exportacao_farm_tech.zip](assets/exportacao_farm_tech.zip).
+2. Extraia os conteúdos do arquivo.
+3. Abra o arquivo `exportacao_farm_tech.dmd` diretamente no **Oracle Data Modeler**.
+
+### 🛠️ Maneira 2:
+1. Importe o arquivo [FarmTech_Schema.ddl](assets/FarmTech_Schema.ddl) no **Oracle Data Modeler**.
+   - **Nota**: Nesta opção, a visualização do DER e MER não será idêntica às imagens apresentadas neste README.
 
 
 ## 🗃 Histórico de lançamentos
+
+* 0.1.2 - 17/04/2024
 
 * 0.1.1 - 16/04/2024
 
@@ -261,3 +268,5 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 ## 📋 Licença
 
 <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/agodoi/template">MODELO GIT FIAP</a> por <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://fiap.com.br">Fiap</a> está licenciado sobre <a href="http://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Attribution 4.0 International</a>.</p>
+
+`
